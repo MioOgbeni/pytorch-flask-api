@@ -1,19 +1,27 @@
+import json
+
 from flask import Flask, request, jsonify
 from healthcheck import HealthCheck
 
 from app.torch_utils import transform_image, get_prediction
 
 app = Flask(__name__)
-health = HealthCheck(app, "/health")
+app.config['JSON_AS_ASCII'] = False
+health = HealthCheck()
+
+app.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/status')
-def status():
-    JSON_PATH="app/status.json"
-    return jsonify(JSON_PATH)
+@app.route('/info', methods=['GET'])
+def info():
+    JSON_PATH="app/info.json"
+    
+    with open(JSON_PATH, encoding='utf-8') as json_stream:
+        data = json.load(json_stream)
+    return jsonify(data)
 
 @app.route('/predict', methods=['POST', 'PUT'])
 def predick():
