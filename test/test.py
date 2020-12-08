@@ -1,13 +1,13 @@
 import requests
 
-resp = requests.post("https://pytorch-flask-api.herokuapp.com/predict", files={'file': open('sample_image.png', 'rb')})
+resp = requests.post("http://localhost:5000/predict", files={'file': open('sample_image.jpg', 'rb')})
 
 print(resp.text)
 
-resp = requests.get("https://pytorch-flask-api.herokuapp.com/health")
+resp = requests.get("http://localhost:5000/health")
 
 print(resp.text)
 
-resp = requests.get("https://pytorch-flask-api.herokuapp.com/info")
+resp = requests.get("http://localhost:5000/info")
 
 print(resp.text)

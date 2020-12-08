@@ -1,13 +1,26 @@
 import json
+import csv
 
 from flask import Flask, request, jsonify
 from healthcheck import HealthCheck
 
 from app.torch_utils import transform_image, get_prediction
 
+def load_classes():
+    data = []
+    with open('app/classes.csv', newline='') as f:
+        reader = csv.reader(f)
+        for item in reader:
+            data.append(item[0])
+        print(data)
+    
+    return data
+    
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 health = HealthCheck()
+
+classes = load_classes()
 
 app.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
 
@@ -39,9 +52,9 @@ def predick():
 
             probability = "{:.2%}".format(prediction[1].item())
 
-            data = {'prediction': prediction[0].item(), 'class_name': str(prediction[0].item()), 'probability': probability}
+            data = {'prediction_id': prediction[0].item(), 'class_name': str(classes[prediction[0].item()]), 'probability': probability}
             return jsonify(data)
-        except:
-            return jsonify({'error': 'error during prediction'})    
+        except Exception as e:
+            return jsonify({'error': str(e)})   
 
 
